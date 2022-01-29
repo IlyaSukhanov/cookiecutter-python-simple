@@ -1,0 +1,13 @@
+{
+  "full_name": "Ilya Sukhanov",
+  "email": "ilya@sukhanov.net",
+  "github_username": "IlyaSukhanov",
+  "project_name": "Cheezoid",
+  "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_') }}",
+  "project_short_description": "I smell. Cheeze. Cheeze. Cheeze. Petril.",
+  "pypi_username": "{{ cookiecutter.github_username }}",
+  "version": "0.1.0",
+  "create_author_file": "y",
+  "open_source_license": ["MIT license", "BSD license", "ISC license", "Apache Software License 2.0", "GNU General Public License v3", "Not open source"],
+  "requirements": "fastapi,sqlalchemy"
+}

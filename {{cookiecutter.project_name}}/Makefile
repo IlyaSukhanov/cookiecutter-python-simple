@@ -28,18 +28,18 @@ help:
 
 
 format: ## auto format all code
-	isort {{ cookiecutter.project_slug }} bin tests setup.py
-	black {{ cookiecutter.project_slug }} bin tests setup.py
+	isort {{ cookiecutter.project_slug }} tests
+	black {{ cookiecutter.project_slug }} tests
 	#yamlfmt -w config/*.yaml
 
 isort: ## check imports with isort
-	isort -c {{ cookiecutter.project_slug }} bin tests setup.py
+	isort -c {{ cookiecutter.project_slug }} tests
 
 black: ## check formatting with black
-	black --check {{ cookiecutter.project_slug }} bin tests setup.py
+	black --check {{ cookiecutter.project_slug }} tests
 
 lint: ## check style with flake8
-	flake8 {{ cookiecutter.project_slug }} bin tests
+	flake8 {{ cookiecutter.project_slug }} tests
 
 clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
 
@@ -58,7 +58,7 @@ clean-pyc: ## remove Python file artifacts
 
 
 test-security:
-	bandit -r . -x ./tests,./bin
+	bandit -r . -x ./tests
 
 test: ## run tests quickly with the default Python
 	py.test --cov={{ cookiecutter.project_slug }} --cov-fail-under=100 --cov-branch --cov-report term-missing

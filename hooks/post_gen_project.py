@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os
 
-PROJECT_DIRECTORY = os.path.realpath(os.path.curdir)
+PROJECT_DIRECTORY = os.getcwd()
 
 
 def remove_file(filepath):

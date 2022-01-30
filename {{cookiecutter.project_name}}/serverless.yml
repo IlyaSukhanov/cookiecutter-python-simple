@@ -1,0 +1,121 @@
+service: {{ cookiecutter.project_slug.replace('_', '-') }}
+
+frameworkVersion: ">=1.67.3"
+
+plugins:
+  - serverless-python-requirements
+  - serverless-dotenv-plugin
+
+provider:
+  name: aws
+  runtime: python3.9
+  versionFunctions: false
+  profile: {{ cookiecutter.aws_profile }} 
+  logs:
+    httpApi: true
+  stage: ${opt:stage, 'dev'}
+  # lambdaHashingVersion: 20201221
+  region: {{ cookiecutter.aws_region }}
+  timeout: 28
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - 'logs:CreateLogGroup'
+            - 'logs:CreateLogStream'
+            - 'logs:DescribeLogGroups'
+            - 'logs:DescribeLogStreams'
+            - 'logs:FilterLogEvents'
+            - 'logs:GetLogEvents'
+            - 'logs:PutLogEvents'
+            - 'SNS:Publish'
+            - 'sqs:ReceiveMessage'
+            - 'sqs:DeleteMessage'
+            - 'sqs:SendMessage'
+            - 'sqs:GetQueueAttributes'
+            - 'lambda:InvokeFunction'
+          Resource:
+            - '*'
+        - Effect: Allow
+          Action:
+            - 's3:*'
+          Resource:  
+            - 'arn:aws:s3:::*'
+        - Effect: Allow
+          Action:
+            - 'apigateway:GET'
+          Resource:  
+            - 'arn:aws:apigateway:*::/apikeys'
+            - 'arn:aws:apigateway:*::/apikeys/*'
+      name: {{ cookiecutter.project_slug.replace('_', '-') }}-${opt:stage, 'dev'} 
+  environment: ${self:custom.environment.${opt:stage, 'dev'}.environment}
+
+functions:
+  app:
+    handler: {{ cookiecutter.project_slug }}.app.handler
+{%- if cookiecutter.aws_api_gateway == 'y' %}
+    events:
+      - httpApi:
+          path: '*'
+{%- endif %}
+
+resources:
+  extensions:
+    AppLogGroup:
+      Properties:
+        RetentionInDays: '365'
+
+custom:
+  environment: 
+    dev:
+      environment:
+        ENVIRONMENT: dev
+        LOG_LEVEL: debug
+    prod:
+      environment:
+        ENVIRONMENT: prod
+        LOG_LEVEL: info
+  pythonRequirements:
+    pythonBin: python3.9
+{%- if cookiecutter.use_postgresql == 'y' %}
+    dockerizePip: true
+    dockerFile: ./Dockerfile
+    dockerSsh: true
+{%- endif %}
+    
+{%- if cookiecutter.use_postgresql == 'y' %}
+    # Caching invalidation is not accurate enough,
+    # it does invalidate on Dockerfile changes 
+    useDownloadCache: false
+    useStaticCache: false
+    dockerExtraFiles:
+      - /usr/lib64/libpq.so
+      - /usr/lib64/libpq.so.5
+      - /usr/lib64/libpq.so.5.5
+      - /usr/lib64/libldap_r-2.4.so.2
+      - /usr/lib64/libldap_r-2.4.so.2.10.7
+      - /usr/lib64/liblber-2.4.so.2
+      - /usr/lib64/liblber-2.4.so.2.10.7
+      - /usr/lib64/libsasl2.so.3
+      - /usr/lib64/libssl3.so
+      - /usr/lib64/libsmime3.so
+      - /usr/lib64/libnss3.so
+      - /usr/lib64/libecpg.so.6
+      - /usr/lib64/libecpg.so.6.4
+      - /usr/lib64/libecpg_compat.so.3
+      - /usr/lib64/libecpg_compat.so.3.4
+      - /usr/lib64/libpgtypes.so.3
+      - /usr/lib64/libpgtypes.so.3.3
+{%- endif %}
+
+
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!venv/**'
+    - '!.direnv/**'
+    - '!data/**'
+    - '!.git/**'
+    - '!.serverless/**'
+    - '/var/task/'

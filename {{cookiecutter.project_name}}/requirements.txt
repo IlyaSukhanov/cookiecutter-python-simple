@@ -1,0 +1,2 @@
+{{ "\n".join(["fastapi", "mangum", "uvicorn"] +cookiecutter.requirements.split(","))  }}
+

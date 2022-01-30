@@ -1,0 +1,16 @@
+-r requirements.txt
+pip
+flake8
+flake8-print
+tox
+coverage
+pytest
+pyflakes
+pytest-cov
+bandit
+black
+isort
+wheel
+twine
+build
+
